@@ -23,21 +23,40 @@ app.get("/api/hello", function (req, res) {
   res.json({ greeting: "hello API" });
 });
 
-app.get("/api/:date", (req, res) => {
-  if (req.params.date.includes("-")) {
-    let utc = new Date((req.params.date));
-    res.json({ unix: utc.getTime() / 1000, utc: utc.toUTCString() });
-  } else {
-    let unix = new Date(Number(req.params.date));
-    console.log("Hello", unix,"P ", req.params.date);
-    res.json({
-      unix: req.params.date,
-      utc: unix,
-    });
+app.get("/api/:date?", (req, res) => {
+  
+  const date = req.params.date;
+  if(!date){
+    res.json({utc:new Date().toUTCString(),unix: new Date().getTime()})
   }
+  console.log(Date.parse(req.params.date));
+  console.log("Input:", date);
+  console.log("Type:", typeof date," ", new Date(date));
+  console.log(
+    "regex:",
+    date.search(/^dd-/),
+    " and Regex2: ",
+    date.match(/^[0-9]{6}/)
+  );
+  if (new Date(date).toString()!= "Invalid Date") {
+    let utc = new Date(date);
+    console.log("C1");
+    // console.log("hehe", utc,"jojo", utc.toUTCString());
+    res.json({ unix: utc.getTime(), utc: utc.toUTCString() });
+  } else if (date.match(/^[0-9]{6}/)) {
+    let unix = new Date(Number(date));
+    console.log("C1");
+    // console.log("Hello", unix,"P ", date);
+    res.json({
+      unix: Number(date),
+      utc: unix.toUTCString(),
+    });
+  } else {
+    res.json({ error: "Invalid date" });
+  }
+ 
 });
-
 // listen for requests :)
-var listener = app.listen(process.env.PORT, function () {
-  console.log("Your app is listening on port " + listener.address().port);
+var listener = app.listen(3001, function () {
+  console.log("Your app is listening on port " + 3001);
 });
